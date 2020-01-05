@@ -1,0 +1,29 @@
+#!/bin/bash
+yum update -y
+yum -y install java*
+yum -y install wget
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum -y install jenkins
+systemctl start jenkins
+systemctl enable jenkins
+
+
+
+
+It asks to copy password from /var/lib/jenkins/secrets/initialAdminPassword
+
+cat /var/lib/jenkins/secrets/initialAdminPassword
+
+9957f2feed244e31a5911c5778652c91
+
+copy above from terminal to GUI
+
+install required plugins, create user account.
+
+
+
+
+
+
+Jenkins URL : http://3.8.187.60:8080/

@@ -1,8 +1,8 @@
 # Launch-Jenkins-Server
 
-1. vpc.tf
+# 1. vpc.tf
 
-# Internet VPC
+Internet VPC
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   instance_tenancy     = "default"
@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Subnets
+Subnets
 resource "aws_subnet" "main-public-1" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.1.0/24"
@@ -37,7 +37,7 @@ resource "aws_subnet" "main-public-2" {
   }
 }
 
-# Internet GW
+Internet GW
 resource "aws_internet_gateway" "main-gw" {
   vpc_id = aws_vpc.main.id
 
@@ -46,7 +46,7 @@ resource "aws_internet_gateway" "main-gw" {
   }
 }
 
-# route tables
+route tables
 resource "aws_route_table" "main-public" {
   vpc_id = aws_vpc.main.id
   route {
@@ -59,7 +59,7 @@ resource "aws_route_table" "main-public" {
   }
 }
 
-# route associations public
+route associations public
 resource "aws_route_table_association" "main-public-1-a" {
   subnet_id      = aws_subnet.main-public-1.id
   route_table_id = aws_route_table.main-public.id
@@ -70,7 +70,7 @@ resource "aws_route_table_association" "main-public-2-a" {
   route_table_id = aws_route_table.main-public.id
 }
 
-2. securitygroup.tf
+# 2. securitygroup.tf
 
 resource "aws_security_group" "jenkins" {
   vpc_id      = aws_vpc.main.id
@@ -100,13 +100,13 @@ resource "aws_security_group" "jenkins" {
   }
 }
 
-3. provider.tf
+# 3. provider.tf
 
 provider "aws" {
   region = var.AWS_REGION
 }
 
-4. vars.tf
+# 4. vars.tf
 
 variable "AWS_REGION" {
 
@@ -128,29 +128,29 @@ variable "PATH_TO_PUBLIC_KEY" {
   default = "mykey.pub"
 }
 
-5. key.tf
+# 5. key.tf
 
 resource "aws_key_pair" "mykeypair" {
   key_name   = "mykeypair"
   public_key = file(var.PATH_TO_PUBLIC_KEY)
 }
 
-6. instance.tf
+# 6. instance.tf
 
 resource "aws_instance" "jenkins" {
   ami          = var.AMIS
   instance_type = "t2.micro"
 
-  # the VPC subnet
+  the VPC subnet
   subnet_id = aws_subnet.main-public-1.id
 
-  # the security group
+  the security group
   vpc_security_group_ids = [aws_security_group.jenkins.id]
 
-  # the public SSH key
+  the public SSH key
   key_name = aws_key_pair.mykeypair.key_name
 
-  # the user data to install jenkins server
+  the user data to install jenkins server
   user_data = "#!/bin/bash\nyum update -y\nyum -y install java*\nyum -y install wget\nwget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo\nrpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key\nyum -y install jenkins\nsystemctl start jenkins\nsystemctl enable jenkins"
 
 }
